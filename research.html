@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobAround - Research Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --success: #22c55e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+
+        .btn-action {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn-action:hover { background-color: #1d4ed8; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .kpi-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+
+        .table-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        tr:hover { background-color: #26354a; }
+
+        .badge-btn {
+            background-color: #334155;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        #status-msg {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            display: none;
+        }
+        .status-error { background-color: #7f1d1d; color: #fecaca; }
+        .status-info { background-color: #1e3a8a; color: #bfdbfe; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1 class="title">JobAround — Research Analytics Dashboard</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Analisi comportamentale anonima sui nudge di Social Proof e Scarsità</p>
+        </div>
+        <div>
+            <button id="btn-export-csv" class="btn-action">Esporta CSV</button>
+            <button id="btn-export-json" class="btn-action" style="background-color: #0d9488;">Esporta JSON</button>
+        </div>
+    </div>
+
+    <div id="status-msg"></div>
+
+    <!-- METRICHE STATISTICHE -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Partecipanti (Click)</div>
+            <div id="kpi-total" class="kpi-value">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Tempo Medio Click</div>
+            <div id="kpi-mean" class="kpi-value">0s</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Tempo Mediano</div>
+            <div id="kpi-median" class="kpi-value">0s</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Min / Max Tempo</div>
+            <div id="kpi-minmax" class="kpi-value">0s / 0s</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Sidebar vs Bottom</div>
+            <div id="kpi-buttons" class="kpi-value">0 / 0</div>
+        </div>
+    </div>
+
+    <!-- TABELLA DATI REALI -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Session ID</th>
+                    <th>Entrata</th>
+                    <th>Click</th>
+                    <th>Tempo al Click (s)</th>
+                    <th>Pulsante</th>
+                    <th>Popup Prova Sociale</th>
+                    <th>Popup Scarsità</th>
+                </tr>
+            </thead>
+            <tbody id="sessions-table-body">
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted);">Caricamento dati da Firestore in corso...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // CONFIGURAZIONE FIREBASE (Uso identico a index.html)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAvOwlznNeNkKsX2cVGZke7oEzA58FHeTg",
+    authDomain: "sitopopup-80ba2.firebaseapp.com",
+    projectId: "sitopopup-80ba2",
+    storageBucket: "sitopopup-80ba2.firebasestorage.app",
+    messagingSenderId: "35325511382",
+    appId: "1:35325511382:web:a8ee438a35a59f503f2b77"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let globalSessionsData = [];
+
+        function showStatus(message, isError = false) {
+            const el = document.getElementById("status-msg");
+            el.style.display = "block";
+            el.className = isError ? "status-error" : "status-info";
+            el.innerText = message;
+        }
+
+        // FORMATTATORE DATA ISO A LOCALE
+        function formatDate(isoString) {
+            if (!isoString || isoString === "Not Shown" || isoString === "N/A") return isoString || "N/A";
+            try {
+                const d = new Date(isoString);
+                if (isNaN(d.getTime())) return isoString;
+                return d.toLocaleTimeString('it-IT') + "." + d.getMilliseconds();
+            } catch (e) {
+                return isoString;
+            }
+        }
+
+        // CALCOLO STATISTICHE ESCLUSIVAMENTE SU DATI REALI
+        function calculateStatistics(sessions) {
+            const appliedSessions = sessions.filter(s => s.timeToApply !== undefined && s.timeToApply !== null);
+            
+            if (appliedSessions.length === 0) return;
+
+            const times = appliedSessions.map(s => parseFloat(s.timeToApply)).sort((a, b) => a - b);
+            
+            // Media
+            const sum = times.reduce((acc, curr) => acc + curr, 0);
+            const mean = (sum / times.length).toFixed(2);
+
+            // Mediana
+            let median = 0;
+            const mid = Math.floor(times.length / 2);
+            if (times.length % 2 === 0) {
+                median = ((times[mid - 1] + times[mid]) / 2).toFixed(2);
+            } else {
+                median = times[mid].toFixed(2);
+            }
+
+            const min = times[0].toFixed(2);
+            const max = times[times.length - 1].toFixed(2);
+
+            const sidebarClicks = appliedSessions.filter(s => s.button === "sidebar_apply").length;
+            const bottomClicks = appliedSessions.filter(s => s.button === "bottom_apply").length;
+
+            document.getElementById("kpi-total").innerText = appliedSessions.length;
+            document.getElementById("kpi-mean").innerText = mean + "s";
+            document.getElementById("kpi-median").innerText = median + "s";
+            document.getElementById("kpi-minmax").innerText = `${min}s / ${max}s`;
+            document.getElementById("kpi-buttons").innerText = `${sidebarClicks} / ${bottomClicks}`;
+        }
+
+        // CARICAMENTO ED ORDINAMENTO DA FIRESTORE
+        async function loadResearchDashboard() {
+            try {
+                // Lettura dalla collection dedicata alla versione pulita
+                const collectionRef = collection(db, "experiments", "jobaround_popup", "sessions");
+                // Ordinamento temporale per entryTime
+                const q = query(collectionRef, orderBy("entryTime", "asc"));
+                const querySnapshot = await getDocs(q);
+
+                globalSessionsData = [];
+                const tbody = document.getElementById("sessions-table-body");
+                tbody.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Nessuna sessione sperimentale registrata. La nuova raccolta dati è attualmente pulita e vuota.</td></tr>`;
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    globalSessionsData.push(data);
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="font-family: monospace;">${data.sessionId || 'N/A'}</td>
+                        <td>${formatDate(data.entryTime)}</td>
+                        <td>${formatDate(data.clickTime)}</td>
+                        <td><strong style="color: var(--accent);">${data.timeToApply !== undefined ? data.timeToApply + 's' : 'Abbandono'}</strong></td>
+                        <td><span class="badge-btn">${data.button || 'Nessuno'}</span></td>
+                        <td>${formatDate(data.socialProofShownAt)}</td>
+                        <td>${formatDate(data.scarcityShownAt)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                calculateStatistics(globalSessionsData);
+
+            } catch (err) {
+                console.error("Errore durante il recupero da Firestore:", err);
+                showStatus("Impossibile connettersi a Firestore. Verificare le credenziali Firebase in research.html o le Regole di Sicurezza.", true);
+            }
+        }
+
+        // ESPORTAZIONE CSV
+        function exportCSV() {
+            if (globalSessionsData.length === 0) {
+                alert("Nessun dato presente da esportare.");
+                return;
+            }
+
+            const headers = ["sessionId", "entryTime", "clickTime", "timeToApply", "timeOnPage", "button", "socialProofShownAt", "scarcityShownAt"];
+            const rows = globalSessionsData.map(s => [
+                s.sessionId || "",
+                s.entryTime || "",
+                s.clickTime || "",
+                s.timeToApply !== undefined ? s.timeToApply : "",
+                s.timeOnPage !== undefined ? s.timeOnPage : "",
+                s.button || "",
+                s.socialProofShownAt || "",
+                s.scarcityShownAt || ""
+            ]);
+
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + headers.join(",") + "\n"
+                + rows.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `jobaround_experiment_data_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ESPORTAZIONE JSON
+        function exportJSON() {
+            if (globalSessionsData.length === 0) {
+                alert("Nessun dato presente da esportare.");
+                return;
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalSessionsData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `jobaround_experiment_data_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.removeChild(downloadAnchor);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            loadResearchDashboard();
+            document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
+            document.getElementById("btn-export-json").addEventListener("click", exportJSON);
+        });
+    </script>
+</body>
+</html>

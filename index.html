@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junior Content & Digital Assistant - JobAround</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --accent-orange: #ea580c;
+            --accent-purple: #6b21a8;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #15803d;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* HEADER */
+        .navbar {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo-badge {
+            background-color: #dbeafe;
+            color: var(--primary);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* CONTAINER LAYOUT */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+        }
+
+        /* MAIN CONTENT */
+        .job-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .job-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .company-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .company-logo-placeholder {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .job-title {
+            font-size: 1.75rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-highlight {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        /* SECTION STYLES */
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .list-custom {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list-custom li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .list-custom li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: -2px;
+        }
+
+        /* COMPANY GALLERY */
+        .office-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .office-gallery img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #e2e8f0;
+        }
+
+        /* SIDEBAR */
+        .sidebar-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 90px;
+        }
+
+        /* BUTTONS */
+        .btn-apply {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+        }
+
+        .btn-apply:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-apply:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-apply-bottom {
+            margin-top: 2rem;
+            padding: 1.25rem 2rem;
+            font-size: 1.2rem;
+        }
+
+        /* EXPERIMENTAL NUDGE POPUPS */
+        .nudge-container {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 360px;
+            pointer-events: none;
+        }
+
+        .nudge-popup {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(-120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: auto;
+            border-left: 6px solid var(--primary);
+        }
+
+        .nudge-popup.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Nudge 1: Social Proof (👀 Altre 23 persone) */
+        .nudge-social {
+            border-left-color: var(--accent-purple);
+            background: linear-gradient(to right, #faf5ff, #ffffff);
+            border: 2px solid #e9d5ff;
+            border-left-width: 6px;
+        }
+
+        .nudge-social .nudge-text {
+            color: #581c87;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        /* Nudge 2: Scarcity (⚡ Mancano solo 2 posizioni) */
+        .nudge-scarcity {
+            border-left-color: var(--accent-orange);
+            background: linear-gradient(to right, #fff7ed, #ffffff);
+            border: 2px solid #fed7aa;
+            border-left-width: 6px;
+            animation: pulse-border 2s infinite;
+        }
+
+        .nudge-scarcity .nudge-text {
+            color: #9a3412;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .nudge-icon {
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-card {
+                position: static;
+            }
+            .nudge-container {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR HEADER -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="logo">
+                JobAround <span class="logo-badge">Research Lab</span>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#">Cerca lavoro</a></li>
+                    <li><a href="#">Trova aziende</a></li>
+                    <li><button class="btn-secondary">Accedi</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="container">
+        
+        <!-- ARTICLE JOB DETAIL -->
+        <article class="job-card">
+            <header class="job-header">
+                <div class="company-meta">
+                    <div class="company-logo-placeholder">NS</div>
+                    <div>
+                        <h2 style="font-size: 1.1rem; color: var(--text-muted);">NovaSystems Digital S.r.l.</h2>
+                        <h1 class="job-title">Junior Content & Digital Assistant</h1>
+                    </div>
+                </div>
+
+                <div class="badges">
+                    <span class="badge">💻 Full Remote con presenza occasionale</span>
+                    <span class="badge">💼 Contratto di Apprendistato / Full-Time</span>
+                    <span class="badge badge-highlight">💰 RAL €23.000 - €25.000</span>
+                    <span class="badge">🌱 Livello: Junior</span>
+                </div>
+            </header>
+
+            <section>
+                <h3 class="section-title">Descrizione dell'offerta</h3>
+                <p>
+                    NovaSystems Digital è una realtà specializzata nello sviluppo di soluzioni digitali per l'editoria e la gestione di contenuti aziendali. Stiamo cercando un/a <strong>Junior Content & Digital Assistant</strong> da inserire nel nostro team operativo.
+                </p>
+                <p style="margin-top: 0.5rem;">
+                    La risorsa lavorerà prevalentemente da remoto, occupandosi dell'organizzazione, pubblicazione e controllo di qualità dei materiali digitali dei nostri clienti. È richiesta una presenza occasionale per allineamenti di team.
+                </p>
+            </section>
+
+            <section>
+                <h3 class="section-title">Mansioni principali</h3>
+                <ul class="list-custom">
+                    <li>Pubblicazione e formattazione di contenuti su piattaforme CMS e portali web aziendali.</li>
+                    <li>Caricamento, archiviazione e catalogazione di risorse digitali e multimediali.</li>
+                    <li>Aggiornamento e verifica periodica delle informazioni presenti nei database operativi.</li>
+                    <li>Supporto operativo nella gestione del calendario e del tracciamento contenuti social.</li>
+                    <li>Controllo qualità e correzione di eventuali errori di impaginazione online.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3 class="section-title">Requisiti richiesti</h3>
+                <ul class="list-custom">
+                    <li>Buona familiarità nell'uso del PC e dei principali strumenti di navigazione web.</li>
+                    <li>Conoscenza di base del Pacchetto Office / Google Workspace (Excel/Fogli in particolare).</li>
+                    <li>Precisione, attenzione ai dettagli e buone capacità organizzative.</li>
+                    <li>Capacità di lavorare in autonomia e rispetto delle scadenze operative.</li>
+                    <li>Non è richiesta precedente esperienza specifica nel ruolo: è previsto un affiancamento iniziale.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3 class="section-title">Perché lavorare con noi</h3>
+                <ul class="list-custom">
+                    <li><strong>Ambiente collaborativo:</strong> Cultura aziendale basata sul rispetto reciproco e supporto continuo.</li>
+                    <li><strong>Formazione continua:</strong> Accesso a corsi e tutorial per lo sviluppo di competenze digitali.</li>
+                    <li><strong>Flessibilità oraria:</strong> Organizzazione del lavoro basata su obiettivi e flessibilità.</li>
+                    <li><strong>Dotazione tecnologica:</strong> Fornitura di laptop aziendale e licenze software dedicate.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3 class="section-title">Il nostro ambiente di lavoro</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    Un'anteprima degli spazi del nostro hub principale dedicato agli allineamenti e ai workshop di team.
+                </p>
+                <div class="office-gallery">
+                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" 
+                         alt="Ufficio moderno open space" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' style=\'background:%23e2e8f0;\'><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2364748b\'>Ambiente Ufficio Moderno</text></svg>';">
+                    
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80" 
+                         alt="Team al lavoro durante meeting" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' style=\'background:%23e2e8f0;\'><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2364748b\'>Meeting di Team</text></svg>';">
+                </div>
+            </section>
+
+            <!-- BOTTOM APPLICATION BUTTON -->
+            <div style="margin-top: 2.5rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                <p style="margin-bottom: 1rem; color: var(--text-muted); font-weight: 500;">Pensi che questo ruolo sia adatto a te? Invia la tua candidatura in meno di due minuti.</p>
+                <button id="apply-btn-bottom" class="btn-apply btn-apply-bottom">
+                    🚀 Candidati ora (Modulo Veloce)
+                </button>
+            </div>
+        </article>
+
+        <!-- ASIDE SIDEBAR -->
+        <aside>
+            <div class="sidebar-card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Pronto a candidarti?</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                    Non è richiesta alcuna registrazione preventiva al portale per completare il primo step.
+                </p>
+
+                <button id="apply-btn-sidebar" class="btn-apply">
+                    Candidati ora
+                </button>
+
+                <div style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <p>✔ Candidatura rapida senza account</p>
+                    <p>✔ Risposta entro 5 giorni lavorativi</p>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- CONTAINER NUDGES SPERIMENTALI POPUP -->
+    <div class="nudge-container">
+        <!-- POPUP 1: PROVA SOCIALE -->
+        <div id="nudge-social" class="nudge-popup nudge-social">
+            <span class="nudge-icon">👀</span>
+            <div class="nudge-text">Altre 23 persone stanno guardando l'annuncio</div>
+        </div>
+
+        <!-- POPUP 2: SCARSITÀ -->
+        <div id="nudge-scarcity" class="nudge-popup nudge-scarcity">
+            <span class="nudge-icon">⚡</span>
+            <div class="nudge-text">Mancano solo 2 posizioni</div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDKs VIA ES MODULES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // =========================================================================
+        // CONFIGURAZIONE FIREBASE
+        // SOSTITUIRE I PLACEHOLDER SOTTOSTANTI CON LE PROPRIE CREDENZIALI
+        // =========================================================================
+        const firebaseConfig = {
+             apiKey: "AIzaSyAvOwlznNeNkKsX2cVGZke7oEzA58FHeTg",
+    authDomain: "sitopopup-80ba2.firebaseapp.com",
+    projectId: "sitopopup-80ba2",
+    storageBucket: "sitopopup-80ba2.firebasestorage.app",
+    messagingSenderId: "35325511382",
+    appId: "1:35325511382:web:a8ee438a35a59f503f2b77"
+        };
+
+        // Inizializzazione Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // TARGET EXTERNAL REDIRECT FORM
+        const TARGET_FORM_URL = "https://forms.cloud.microsoft/e/4P7QfnZ1Gt";
+
+        // VETTORE DI STATO DELLA SESSIONE SPERIMENTALE
+        let sessionData = {
+            sessionId: null,
+            entryTimeMs: 0,
+            entryTimeISO: null,
+            socialProofShownAt: null,
+            scarcityShownAt: null,
+            clickTimeISO: null,
+            timeToApply: null,
+            timeOnPage: null,
+            buttonUsed: null,
+            exitTimeISO: null
+        };
+
+        let applicationSubmitted = false;
+
+        // GENERATORE UTILS UUID v4
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // INIZIALIZZAZIONE SESSIONE ANONIMA
+        function initializeSession() {
+            let existingId = sessionStorage.getItem("jobaround_session_id");
+            let existingEntry = sessionStorage.getItem("jobaround_entry_time");
+
+            const now = Date.now();
+            const nowISO = new Date(now).toISOString();
+
+            if (!existingId) {
+                existingId = "sess_" + generateUUID();
+                sessionStorage.setItem("jobaround_session_id", existingId);
+                sessionStorage.setItem("jobaround_entry_time", now.toString());
+                sessionStorage.setItem("jobaround_entry_iso", nowISO);
+                sessionData.entryTimeMs = now;
+                sessionData.entryTimeISO = nowISO;
+            } else {
+                sessionData.entryTimeMs = parseInt(existingEntry, 10) || now;
+                sessionData.entryTimeISO = sessionStorage.getItem("jobaround_entry_iso") || nowISO;
+            }
+
+            sessionData.sessionId = existingId;
+        }
+
+        // MOSTRA NUDGE POPUP PROVA SOCIALE (3 Secondi)
+        function triggerSocialProofNudge() {
+            setTimeout(() => {
+                const popup = document.getElementById("nudge-social");
+                if (popup) {
+                    popup.classList.add("visible");
+                    sessionData.socialProofShownAt = new Date().toISOString();
+                }
+            }, 3000);
+        }
+
+        // MOSTRA NUDGE POPUP SCARSITÀ (7 Secondi)
+        function triggerScarcityNudge() {
+            setTimeout(() => {
+                const popup = document.getElementById("nudge-scarcity");
+                if (popup) {
+                    popup.classList.add("visible");
+                    sessionData.scarcityShownAt = new Date().toISOString();
+                }
+            }, 7000);
+        }
+
+        // SALVAGGIO SESSIONE SU FIRESTORE E REDIRECT
+        async function handleApplicationSubmit(buttonIdentifier) {
+            if (applicationSubmitted) return;
+            applicationSubmitted = true;
+
+            // Disabilita UI per prevenire doppi click
+            const btnSidebar = document.getElementById("apply-btn-sidebar");
+            const btnBottom = document.getElementById("apply-btn-bottom");
+            if (btnSidebar) btnSidebar.disabled = true;
+            if (btnBottom) btnBottom.disabled = true;
+
+            const clickTimestampMs = Date.now();
+            const clickTimestampISO = new Date(clickTimestampMs).toISOString();
+            
+            // Calcolo preciso del tempo impiegato in secondi
+            const computedTimeToApply = parseFloat(((clickTimestampMs - sessionData.entryTimeMs) / 1000).toFixed(2));
+
+            sessionData.clickTimeISO = clickTimestampISO;
+            sessionData.timeToApply = computedTimeToApply;
+            sessionData.timeOnPage = computedTimeToApply;
+            sessionData.buttonUsed = buttonIdentifier;
+
+            // Struttura documento da salvare
+            const payload = {
+                sessionId: sessionData.sessionId,
+                entryTime: sessionData.entryTimeISO,
+                clickTime: sessionData.clickTimeISO,
+                timeToApply: sessionData.timeToApply,
+                timeOnPage: sessionData.timeOnPage,
+                button: sessionData.buttonUsed,
+                socialProofShownAt: sessionData.socialProofShownAt || "Not Shown",
+                scarcityShownAt: sessionData.scarcityShownAt || "Not Shown",
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                // Salvataggio nella collezione della versione pulita/finale
+                const docRef = doc(db, "experiments", "jobaround_popup", "sessions", sessionData.sessionId);
+                await setDoc(docRef, payload);
+            } catch (error) {
+                console.error("Errore nel salvataggio su Firestore:", error);
+                // In caso di errore di rete/Firestore, procedi comunque per non bloccare l'utente partecipante
+            } finally {
+                window.location.href = TARGET_FORM_URL;
+            }
+        }
+
+        // TRACKING USCITA DALLA PAGINA (VISIBILITYCHANGE / PAGEHIDE)
+        function attachExitTracking() {
+            const handleExit = () => {
+                if (applicationSubmitted) return;
+                const exitMs = Date.now();
+                const exitISO = new Date(exitMs).toISOString();
+                const timeSpent = parseFloat(((exitMs - sessionData.entryTimeMs) / 1000).toFixed(2));
+
+                const exitPayload = {
+                    sessionId: sessionData.sessionId,
+                    entryTime: sessionData.entryTimeISO,
+                    exitTime: exitISO,
+                    timeOnPage: timeSpent,
+                    status: "abandoned",
+                    socialProofShownAt: sessionData.socialProofShownAt || "Not Shown",
+                    scarcityShownAt: sessionData.scarcityShownAt || "Not Shown"
+                };
+
+                // Invia via navigator.sendBeacon se supportato, altrimenti Firestore non garantisce completamento sincrono su exit
+                const docRef = doc(db, "experiments", "jobaround_popup", "sessions", sessionData.sessionId);
+                setDoc(docRef, exitPayload, { merge: true }).catch(() => {});
+            };
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "hidden") handleExit();
+            });
+        }
+
+        // INITIALIZATION ENTRYPOINT
+        window.addEventListener("DOMContentLoaded", () => {
+            // Reindirizzamento se in modalità ricerca ?research=true
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("research") === "true") {
+                window.location.href = "research.html";
+                return;
+            }
+
+            initializeSession();
+            triggerSocialProofNudge();
+            triggerScarcityNudge();
+            attachExitTracking();
+
+            // BIND EVENT LISTENERS
+            const btnSidebar = document.getElementById("apply-btn-sidebar");
+            const btnBottom = document.getElementById("apply-btn-bottom");
+
+            if (btnSidebar) {
+                btnSidebar.addEventListener("click", () => handleApplicationSubmit("sidebar_apply"));
+            }
+            if (btnBottom) {
+                btnBottom.addEventListener("click", () => handleApplicationSubmit("bottom_apply"));
+            }
+        });
+    </script>
+</body>
+</html>
